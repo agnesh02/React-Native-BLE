@@ -13,9 +13,6 @@ function HomeScreen() {
 			<TouchableOpacity onPress={() => naviagation.navigate("List Devices")}>
 				<Text>Go to device scanning screen</Text>
 			</TouchableOpacity>
-			<TouchableOpacity style={{marginTop: 30}} onPress={() => naviagation.navigate("Device Action")}>
-				<Text>Go to device action screen</Text>
-			</TouchableOpacity>
 		</View>
 	);
 }
