@@ -79,7 +79,7 @@ const ListBleDevicesScreen = function App({ navigation }) {
             }
         });
 
-        setTimeout(() => { stopScan() }, 6000);
+        //setTimeout(() => { stopScan() }, 6000);
     }
 
     const stopScan = async function () {
