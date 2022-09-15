@@ -45,6 +45,7 @@ const ListBleDevicesScreen = function App({ navigation }) {
     }
 
     const startScan = async function () {
+        Toaster("Scanning time : 10 seconds")
         deviceList.length = 0
         _BleManager.startDeviceScan(null, null, (error, device) => {
             if (error) {
@@ -79,7 +80,7 @@ const ListBleDevicesScreen = function App({ navigation }) {
             }
         });
 
-        //setTimeout(() => { stopScan() }, 6000);
+        setTimeout(() => { stopScan() }, 10000);
     }
 
     const stopScan = async function () {
