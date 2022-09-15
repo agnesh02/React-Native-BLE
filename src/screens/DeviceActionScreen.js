@@ -4,7 +4,7 @@ import base64 from 'react-native-base64'
 import { _BleManager, connectDevice } from '../components/BleManager';
 import Toaster from "../components/Toaster";
 
-const DeviceaActionScreen = function ({ route }) {
+const DeviceActionScreen = function ({ route }) {
 
     const { data, deviceId, deviceName } = route.params
 
@@ -17,6 +17,7 @@ const DeviceaActionScreen = function ({ route }) {
             console.log("Decoding read value")
             const decodedSample = base64.decode(encodedSample)
             console.log(decodedSample)
+            Toaster(`Data read : ${decodedSample}`)
         }
         catch (e) {
             console.log(e.message)
@@ -24,10 +25,41 @@ const DeviceaActionScreen = function ({ route }) {
         }
     }
 
-    const reconnect = async function(){
-        const connection = await connectDevice(deviceId) 
-        if(connection != "Connection error")
-            Toaster("Reconnected with the device successfully")  
+    // const writeData = async function () {
+    //     characteristic.writeWithResponse(valueBase64: Base64, transactionId: ?TransactionId): Promise
+    //     device.writeCharacteristicWithResponseForService(serviceUUID: UUID, characteristicUUID: UUID, valueBase64: Base64, transactionId: ?TransactionId)
+    //     bleManager.writeCharacteristicWithResponseForDevice(deviceIdentifier: DeviceId, serviceUUID: UUID, characteristicUUID: UUID, base64Value: Base64, transactionId: ?TransactionId)
+    // }
+
+    // const notifyData = async function () {
+    //     characteristic.monitor(listener: (error: ?Error, characteristic: ?Characteristic) => void, transactionId: ?TransactionId): Subscription
+    //     device.monitorCharacteristicForService(serviceUUID: UUID, characteristicUUID: UUID, listener: (error: ?Error, characteristic: ?Characteristic) => void, transactionId: ?TransactionId)
+    //     bleManager.monitorCharacteristicForDevice(deviceIdentifier: DeviceId, serviceUUID: UUID, characteristicUUID: UUID, listener: (error: ?Error, characteristic: ?Characteristic) => void, transactionId: ?TransactionId)
+    // }
+
+    const reconnect = async function () {
+
+        Toaster("Trying to reconnect with the device...Please wait..")
+        const reconnection = await connectDevice(deviceId)
+
+        if (typeof (reconnection) === typeof (""))
+            Toaster(reconnection)
+        else
+            Toaster("Reconnected with the device successfully")
+    }
+
+    const disconnect = async function () {
+
+        Toaster("Disconnecting device...Please wait..")
+        _BleManager.cancelDeviceConnection(deviceId)
+            .then(async (device) => {
+                console.log(await device.isConnected())
+                Toaster("Device has been disconnected successfully")
+            })
+            .catch((error) => {
+                console.log(error.message)
+                Toaster(error.message)
+            });
     }
 
     return (
@@ -54,6 +86,9 @@ const DeviceaActionScreen = function ({ route }) {
                             </TouchableOpacity>
                             <TouchableOpacity style={styling.button2} onPress={() => { reconnect() }} >
                                 <Text style={styling.buttonText}>Reconnect</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styling.button3} onPress={() => { disconnect() }} >
+                                <Text style={styling.buttonText}>Disconnect</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -119,9 +154,17 @@ const styling = StyleSheet.create({
         backgroundColor: 'green',
         width: '100%',
         padding: 8,
-        borderRadius: 10,
+        borderRadius: 16,
         alignItems: 'center',
         marginTop: 80
+    },
+    button3: {
+        backgroundColor: 'red',
+        width: '100%',
+        padding: 8,
+        borderRadius: 16,
+        alignItems: 'center',
+        marginTop: 10
     },
     buttonText: {
         color: 'white',
@@ -130,4 +173,5 @@ const styling = StyleSheet.create({
     }
 })
 
-export default DeviceaActionScreen
+
+export default DeviceActionScreen

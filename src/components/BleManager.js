@@ -4,13 +4,14 @@ import Toaster from './Toaster';
 const _BleManager = new BleManager()
 
 const connectDevice = async function (deviceId) {
-    console.log("connecting to device..")
 
+    console.log("connecting to device..")
+    
     const msg = await _BleManager.connectToDevice(deviceId, null)
         .then(async (device) => {
 
             console.log('isConnected', await device.isConnected())
-            console.log('discovering all services and chaarcteristics...')
+            console.log('discovering all services and characteristics...')
             const data = await _BleManager.discoverAllServicesAndCharacteristicsForDevice(device.id)
             console.log("Discovery", data)
             console.log('success')
@@ -29,7 +30,7 @@ const connectDevice = async function (deviceId) {
         })
         .catch((error) => {
             console.log(error.message)
-            return "Connection error"
+            return error.message
         });
 
     return msg

@@ -11,7 +11,7 @@ function HomeScreen() {
 	return (
 		<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
 			<TouchableOpacity onPress={() => naviagation.navigate("List Devices")}>
-				<Text>Go to device scanning screen</Text>
+				<Text style={{fontSize: 18, color: "#2559f4", fontWeight: "bold" }}>Navigate to device scanning screen</Text>
 			</TouchableOpacity>
 		</View>
 	);

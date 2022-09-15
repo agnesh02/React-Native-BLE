@@ -25,6 +25,7 @@ const ListBleDevicesScreen = function App({ navigation }) {
 
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
             console.log("Permission Granted. Try scanning again");
+
         } else {
             console.log("Permission denied");
         }
@@ -39,10 +40,7 @@ const ListBleDevicesScreen = function App({ navigation }) {
             setButtonTextState("Stop Scanning")
         }
         else {
-            _BleManager.stopDeviceScan()
-            setIsScanning(false)
-            console.log("Scanning Stopped")
-            setButtonTextState("Start Scanning")
+            stopScan()
         }
     }
 
@@ -50,9 +48,22 @@ const ListBleDevicesScreen = function App({ navigation }) {
         deviceList.length = 0
         _BleManager.startDeviceScan(null, null, (error, device) => {
             if (error) {
+                stopScan()
                 console.log(error.message)
-                if (error.message === "Device is not authorized to use BluetoothLE")
-                    requestLocationPermission()
+                switch (error.message) {
+                    case "Device is not authorized to use BluetoothLE":
+                        requestLocationPermission()
+                        Toaster("Please provide location permissions")
+                        return
+                    case "BluetoothLE is powered off":
+                        Toaster("Please turn on your bluetooth")
+                        return
+                    case "Location services are disabled":
+                        Toaster("Please turn on your location")
+                        return
+                    default:
+                        Toaster(error.message)
+                }
                 return
             }
 
@@ -67,21 +78,32 @@ const ListBleDevicesScreen = function App({ navigation }) {
                 console.log(deviceList)
             }
         });
+
+        setTimeout(() => { stopScan() }, 6000);
+    }
+
+    const stopScan = async function () {
+        _BleManager.stopDeviceScan()
+        setIsScanning(false)
+        console.log("Scanning Stopped")
+        setButtonTextState("Start Scanning")
     }
 
     const connect = async function (deviceId, deviceName) {
 
         const connection = await connectDevice(deviceId)
 
-        if (connection != "Connection error")
-            upOnConnection(connection, deviceId, deviceName)
-        else
+        if (typeof (connection) === typeof (""))
             Toaster(connection)
+        else
+            upOnConnection(connection, deviceId, deviceName)
     }
 
     const upOnConnection = function (data, connectedDeviceId, connectedDeviceName) {
+
         Toaster("Connected with the device successfully");
         navigation.navigate("Device Action", { data: data, deviceId: connectedDeviceId, deviceName: connectedDeviceName })
+        setIsConnecting(false)
     }
 
     return (
@@ -210,5 +232,6 @@ const styling = StyleSheet.create({
         top: 300
     }
 });
+
 
 export default ListBleDevicesScreen
